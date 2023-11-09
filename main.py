@@ -12,4 +12,4 @@ while True:
             pg.quit()
             sys.exit()
     pg.display.flip()
-    # rjvvtyn djcenbsaxxw;elnqcmx,zw укцттскчцс3ш
+print(5)
