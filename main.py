@@ -13,3 +13,4 @@ while True:
             sys.exit()
     pg.display.flip()
 print(5)
+print(10)
