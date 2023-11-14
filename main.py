@@ -48,8 +48,16 @@ class Ball:
         """
         if self.x>=789 or self.x <= 10:
             self.vx = -(self.vx)*0.9
+            if self.x>=789:
+                self.x = self.x-5
+            else:
+                self.x = self.x +5
         if (self.y>=590) or self.y <=10:
             self.vy = -(self.vy)*0.9
+            if (self.y >= 590):
+                self.y = self.y - 5
+            else:
+                self.y = self.y + 5
         self.x += self.vx
         self.y += self.vy
         self.vy = self.vy + 1
