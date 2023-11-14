@@ -46,10 +46,10 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        if self.x>=790 or self.x <= 10:
-            self.vx = -self.vx
+        if self.x>=789 or self.x <= 10:
+            self.vx = -(self.vx)*0.9
         if (self.y>=590) or self.y <=10:
-            self.vy = -self.vy-1
+            self.vy = -(self.vy)*0.9
         self.x += self.vx
         self.y += self.vy
         self.vy = self.vy + 1
@@ -102,7 +102,7 @@ class Gun:
         new_ball.vy = - self.f2_power * math.sin(self.an)
         balls.append(new_ball)
         self.f2_on = 0
-        self.f2_power = 10
+        self.f2_power = 20
 
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
