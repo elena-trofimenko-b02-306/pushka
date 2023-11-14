@@ -65,8 +65,9 @@ class Ball:
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        # FIXME
-            return False
+        if (self.x - obj.x)**2 + (self.y-obj.y)**2 == (self.r + obj.r)**2
+            return True
+        return False
 
 
 class Gun:
@@ -107,7 +108,7 @@ class Gun:
             self.color = GREY
 
     def draw(self):
-        # FIXIT don't know how to do it
+        #FIXIT don't know how to do it
 
     def power_up(self):
         if self.f2_on:
@@ -123,6 +124,11 @@ class Target:
     # self.live = 1
     # FIXME: don't work!!! How to call this functions when object is created?
     # self.new_target()
+    def __init__(self,screen,points = 0,live = 1):
+        self.points = points
+        self.live = live
+        self.screen = screen
+
 
     def new_target(self):
         """ Инициализация новой цели. """
@@ -131,12 +137,12 @@ class Target:
         r = self.r = rnd(2, 50)
         color = self.color = RED
 
-    def hit(self, points=1):
+    def hit(self, pointss=1):
         """Попадание шарика в цель."""
-        self.points += points
+        self.points += pointss  #добавила дополнительную s, чтобы отличать наши очки от той единицы, которая здесь добавояется про пропадании
 
     def draw(self):
-        ...
+        pygame.draw.circle(self.screen,self.color, (self.x, self.y), self.r)
 
 
 pygame.init()
