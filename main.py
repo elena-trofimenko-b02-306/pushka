@@ -1,5 +1,6 @@
 import math
 from random import choice
+import random
 
 import pygame
 
@@ -45,13 +46,13 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        if self.x==800 or self.x==0:
-            self.vx -= 2*self.vx
-        if self.y==600 or self.y==0:
-            self.vx -= 2*self.vx
+        if self.x>=790 or self.x <= 10:
+            self.vx = -self.vx
+        if (self.y>=590) or self.y <=10:
+            self.vy = -self.vy
         self.x += self.vx
-        self.y -= self.vy
-        self.vy = self.vy + 10
+        self.y += self.vy
+        self.vy = self.vy + 1
 
 
     def draw(self):
@@ -70,7 +71,7 @@ class Ball:
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        if (self.x - obj.x)**2 + (self.y-obj.y)**2 == (self.r + obj.r)**2:
+        if (self.x - obj.x)**2 + (self.y-obj.y)**2 < (self.r + obj.r)**2:
             return True
         return False
 
@@ -114,6 +115,8 @@ class Gun:
 
     def draw(self):
         #FIXIT don't know how to do it
+        pygame.draw.rect(self.screen,GREY,(20,460,20,20))
+        pygame.draw.rect(self.screen, MAGENTA, (10, 460, 10, 50))
 
     def power_up(self):
         if self.f2_on:
@@ -133,14 +136,17 @@ class Target:
         self.points = points
         self.live = live
         self.screen = screen
-
+        self.color = RED
+        self.x = choice(list(range(600, 781)))
+        self.y = choice(list(range(300, 550)))
+        self.r = choice(list(range(2, 50)))
 
     def new_target(self):
         """ Инициализация новой цели. """
-        x = self.x = rnd(600, 780)
-        y = self.y = rnd(300, 550)
-        r = self.r = rnd(2, 50)
-        color = self.color = RED
+        x = self.x = choice(list(range(600, 780)))
+        y =  self.y = choice(list(range(300, 550)))
+        r = self.r = choice(list(range(2, 50)))
+
 
     def hit(self, pointss=1):
         """Попадание шарика в цель."""
@@ -157,7 +163,7 @@ balls = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
-target = Target()
+target = Target(screen)
 finished = False
 
 while not finished:
