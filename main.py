@@ -49,7 +49,7 @@ class Ball:
         if self.x>=790 or self.x <= 10:
             self.vx = -self.vx
         if (self.y>=590) or self.y <=10:
-            self.vy = -self.vy
+            self.vy = -self.vy-1
         self.x += self.vx
         self.y += self.vy
         self.vy = self.vy + 1
@@ -71,7 +71,7 @@ class Ball:
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        if (self.x - obj.x)**2 + (self.y-obj.y)**2 < (self.r + obj.r)**2:
+        if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
             return True
         return False
 
@@ -141,11 +141,14 @@ class Target:
         self.y = choice(list(range(300, 550)))
         self.r = choice(list(range(2, 50)))
 
-    def new_target(self):
+    def new_target(self,screen):
         """ Инициализация новой цели. """
-        x = self.x = choice(list(range(600, 780)))
-        y =  self.y = choice(list(range(300, 550)))
-        r = self.r = choice(list(range(2, 50)))
+        self.x = choice(list(range(600, 781)))
+        self.y = choice(list(range(300, 550)))
+        self.r = choice(list(range(10, 50)))
+        self.screen = screen
+        self.live = 1
+        self.color = RED
 
 
     def hit(self, pointss=1):
@@ -190,7 +193,7 @@ while not finished:
         if b.hittest(target) and target.live:
             target.live = 0
             target.hit()
-            target.new_target()
+            target.new_target(screen)
     gun.power_up()
 
 pygame.quit()
