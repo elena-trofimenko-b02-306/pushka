@@ -37,7 +37,7 @@ class Ball:
         self.vx = 0
         self.vy = 0
         self.color = choice(GAME_COLORS)
-        self.live = 30
+        self.live = 5
 
     def move(self):
         """Переместить мяч по прошествии единицы времени.
@@ -140,11 +140,11 @@ class Target:
     # self.live = 1
     # FIXME: don't work!!! How to call this functions when object is created?
     # self.new_target()
-    def __init__(self,screen,points = 0,live = 1):
+    def __init__(self,screen,color,points = 0,live = 1):
         self.points = points
         self.live = live
         self.screen = screen
-        self.color = RED
+        self.color = color
         self.x = choice(list(range(600, 781)))
         self.y = choice(list(range(300, 550)))
         self.r = choice(list(range(2, 50)))
@@ -154,7 +154,7 @@ class Target:
     def new_target(self,screen):
         """ Инициализация новой цели. """
         self.x = choice(list(range(600, 781)))
-        self.y = choice(list(range(300, 550)))
+        self.y = choice(list(range(300, 400)))
         self.r = choice(list(range(10, 50)))
         self.vx = 2
         self.vy = 2
@@ -173,6 +173,7 @@ class Target:
             self.vx = -(self.vx)
             if self.x >= 800-self.r:
                 self.x = self.x - 5
+
             else:
                 self.x = self.x + 5
         if (self.y >= 600 - self.r) or self.y <= self.r:
@@ -200,16 +201,20 @@ balls = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
-target = Target(screen)
+target = Target(screen, RED)
+another_target = Target(screen,CYAN)
 finished = False
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
     target.draw()
+    another_target.draw()
     target.move()
+    another_target.move()
     for b in balls:
-        b.draw()
+        if b.live>0:
+           b.draw()
     pygame.display.update()
 
     clock.tick(FPS)
@@ -228,7 +233,14 @@ while not finished:
         if b.hittest(target) and target.live:
             target.live = 0
             target.hit()
+            b.live = b.live - 1
             target.new_target(screen)
+        if b.hittest(another_target) and another_target.live:
+            another_target.live = 0
+            another_target.hit()
+            b.live = b.live - 1
+            another_target.new_target(screen)
+
     gun.power_up()
 
 pygame.quit()
