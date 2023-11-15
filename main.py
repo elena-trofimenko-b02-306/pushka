@@ -148,15 +148,41 @@ class Target:
         self.x = choice(list(range(600, 781)))
         self.y = choice(list(range(300, 550)))
         self.r = choice(list(range(2, 50)))
+        self.vx = 2
+        self.vy = 2
 
     def new_target(self,screen):
         """ Инициализация новой цели. """
         self.x = choice(list(range(600, 781)))
         self.y = choice(list(range(300, 550)))
         self.r = choice(list(range(10, 50)))
+        self.vx = 2
+        self.vy = 2
         self.screen = screen
         self.live = 1
         self.color = RED
+
+    def move(self):
+        """Переместить мяч по прошествии единицы времени.
+
+        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
+        self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
+        и стен по краям окна (размер окна 800х600).
+        """
+        if self.x >= 800-self.r or self.x <= self.r:
+            self.vx = -(self.vx)
+            if self.x >= 800-self.r:
+                self.x = self.x - 5
+            else:
+                self.x = self.x + 5
+        if (self.y >= 600 - self.r) or self.y <= self.r:
+            self.vy = -(self.vy)
+            if (self.y >= 600 - self.r):
+                self.y = self.y - 5
+            else:
+                self.y = self.y + 5
+        self.x += self.vx
+        self.y += self.vy
 
 
     def hit(self, pointss=1):
@@ -181,6 +207,7 @@ while not finished:
     screen.fill(WHITE)
     gun.draw()
     target.draw()
+    target.move()
     for b in balls:
         b.draw()
     pygame.display.update()
