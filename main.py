@@ -1,6 +1,7 @@
 import math
 from random import choice
-import random
+import numpy as np
+
 
 import pygame
 
@@ -16,14 +17,14 @@ CYAN = 0x00FFCC
 BLACK = (0, 0, 0)
 WHITE = 0xFFFFFF
 GREY = 0x7D7D7D
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+GAME_COLORS = [RED, BLUE, YELLOW, GREEN, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
 
 
 class Ball:
-    def __init__(self, screen: pygame.Surface, x=40, y=450):
+    def __init__(self, screen: pygame.Surface,gun, x=40, y=450):
         """ Конструктор класса ball
 
         Args:
@@ -31,7 +32,7 @@ class Ball:
         y - начальное положение мяча по вертикали
         """
         self.screen = screen
-        self.x = x
+        self.x = gun.x
         self.y = y
         self.r = 10
         self.vx = 0
@@ -83,6 +84,67 @@ class Ball:
             return True
         return False
 
+class FireBall:
+    def __init__(self, screen: pygame.Surface ,gun , x=40, y=450):
+        """ Конструктор класса ball
+
+        Args:
+        x - начальное положение мяча по горизонтали
+        y - начальное положение мяча по вертикали
+        """
+        self.screen = screen
+        self.x = gun.x
+        self.y = y
+        self.r = 15
+        self.vx = 0
+        self.vy = 0
+        self.color = MAGENTA
+        self.live = 5
+
+    def move(self):
+        """Переместить мяч по прошествии единицы времени.
+
+        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
+        self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
+        и стен по краям окна (размер окна 800х600).
+        """
+        if self.x>=789 or self.x <= 10:
+            self.vx = -(self.vx)*0.9
+            if self.x>=789:
+                self.x = self.x-5
+            else:
+                self.x = self.x +5
+        if (self.y>=590) or self.y <=10:
+            self.vy = -(self.vy)*0.9
+            if (self.y >= 590):
+                self.y = self.y - 5
+            else:
+                self.y = self.y + 5
+        self.x += self.vx
+        self.y += self.vy
+        self.vy = self.vy + 1
+
+
+    def draw(self):
+        pygame.draw.circle(
+            self.screen,
+            (250, 102, 0) ,
+            (self.x, self.y),
+            self.r
+        )
+
+    def hittest(self, obj):
+        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
+
+        Args:
+            obj: Обьект, с которым проверяется столкновение.
+        Returns:
+            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
+        """
+        if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
+            return True
+        return False
+
 
 class Gun:
     def __init__(self, screen):
@@ -91,6 +153,8 @@ class Gun:
         self.f2_on = 0
         self.an = 1
         self.color = GREY
+        self.vx = 1
+        self.x = 20
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -103,12 +167,19 @@ class Gun:
         """
         global balls, bullet
         bullet += 1
-        new_ball = Ball(self.screen)
+        k = choice([0,1])
+        if k==0:
+               new_ball = Ball(self.screen,gun)
+        else:
+            new_ball = FireBall(self.screen,gun)
         new_ball.r += 5
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
-        balls.append(new_ball)
+        if k==0:
+             balls.append(new_ball)
+        else:
+            fireballs.append(new_ball)
         self.f2_on = 0
         self.f2_power = 20
 
@@ -123,8 +194,8 @@ class Gun:
 
     def draw(self):
         #FIXIT don't know how to do it
-        pygame.draw.rect(self.screen,GREY,(20,460,20,20))
-        pygame.draw.rect(self.screen, MAGENTA, (10, 460, 10, 50))
+        pygame.draw.rect(self.screen,GREY,(self.x,460,20,20))
+        pygame.draw.rect(self.screen, MAGENTA, (self.x-10, 460, 10, 50))
 
     def power_up(self):
         if self.f2_on:
@@ -133,11 +204,35 @@ class Gun:
             self.color = RED
         else:
             self.color = GREY
+    def move(self):
+        """Переместить мяч по прошествии единицы времени.
+
+        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
+        self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
+        и стен по краям окна (размер окна 800х600).
+        """
+        if self.x>=789 or self.x <= 10:
+            self.vx = -(self.vx)
+            if self.x>=789:
+                self.x = self.x-5
+            else:
+                self.x = self.x +5
+        self.x += self.vx
+
 
 
 class Target:
     # self.points = 0
-    # self.live = 1
+    # self.live = 1RED
+    #         else:
+    #             self.color = GREY
+    #
+    #     def move(self):
+    #         """Движение пушки будет осуществляться с постоянной скоростью по оси х.
+    #         """
+    #         if self.x >= 800  or self.x <= 10:
+    #             self.vx = -(self.vx)
+    #             if
     # FIXME: don't work!!! How to call this functions when object is created?
     # self.new_target()
     def __init__(self,screen,color,points = 0,live = 1):
@@ -147,20 +242,20 @@ class Target:
         self.color = color
         self.x = choice(list(range(600, 781)))
         self.y = choice(list(range(300, 550)))
-        self.r = choice(list(range(2, 50)))
+        self.r = choice(list(range(15, 70)))
         self.vx = 2
         self.vy = 2
 
-    def new_target(self,screen):
+    def new_target(self,screen,color):
         """ Инициализация новой цели. """
         self.x = choice(list(range(600, 781)))
         self.y = choice(list(range(300, 400)))
         self.r = choice(list(range(10, 50)))
-        self.vx = 2
-        self.vy = 2
+        self.vx = 1
+        self.vy = 1
         self.screen = screen
         self.live = 1
-        self.color = RED
+        self.color = color
 
     def move(self):
         """Переместить мяч по прошествии единицы времени.
@@ -192,17 +287,76 @@ class Target:
 
     def draw(self):
         pygame.draw.circle(self.screen,self.color, (self.x, self.y), self.r)
+class GravityTarget:
+    # self.points = 0
+    # self.live = 1
+    # FIXME: don't work!!! How to call this functions when object is created?
+    # self.new_target()
+    def __init__(self,screen,color,points = 0,live = 1):
+        self.points = points
+        self.live = live
+        self.screen = screen
+        self.color = color
+        self.x = choice(list(range(200, 400)))
+        self.y = choice(list(range(400, 650)))
+        self.r = choice(list(range(15, 60)))
+        self.vx = 2
+        self.vy = 0
 
+    def new_target(self,screen,color):
+        """ Инициализация новой цели. """
+        self.x = choice(list(range(600, 781)))
+        self.y = choice(list(range(300, 400)))
+        self.r = choice(list(range(10, 50)))
+        self.vx = 2
+        self.vy = 1
+        self.screen = screen
+        self.live = 1
+        self.color = color
+
+    def move(self):
+        """Переместить мяч по прошествии единицы времени.
+
+        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
+        self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
+        и стен по краям окна (размер окна 800х600).
+        """
+        if self.x >= 800-self.r or self.x <= self.r:
+            self.vx = -(self.vx)
+            if self.x >= 800-self.r:
+                self.x = self.x - 5
+
+            else:
+                self.x = self.x + 5
+        if (self.y >= 600 - self.r) or self.y <= self.r:
+            self.vy = -(self.vy)*0.8
+            if (self.y >= 600 - self.r):
+                self.y = self.y - 5
+            else:
+                self.y = self.y + 5
+        self.x += self.vx
+        self.y += self.vy
+        self.vx = self.vx + 1
+        self.vy = self.vy + np.cos(self.vx)
+
+
+    def hit(self, pointss=1):
+        """Попадание шарика в цель."""
+        self.points += pointss  #добавила дополнительную s, чтобы отличать наши очки от той единицы, которая здесь добавояется про пропадании
+
+    def draw(self):
+        pygame.draw.circle(self.screen,self.color, (self.x, self.y), self.r)
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 bullet = 0
 balls = []
+fireballs = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
 target = Target(screen, RED)
-another_target = Target(screen,CYAN)
+another_target = GravityTarget(screen,CYAN)
 finished = False
 
 while not finished:
@@ -212,9 +366,13 @@ while not finished:
     another_target.draw()
     target.move()
     another_target.move()
+    gun.move()
     for b in balls:
         if b.live>0:
            b.draw()
+    for f in fireballs:
+        if f.live>0:
+            f.draw()
     pygame.display.update()
 
     clock.tick(FPS)
@@ -230,16 +388,32 @@ while not finished:
 
     for b in balls:
         b.move()
-        if b.hittest(target) and target.live:
+        if b.hittest(target) and target.live and b.live:
             target.live = 0
             target.hit()
-            b.live = b.live - 1
-            target.new_target(screen)
-        if b.hittest(another_target) and another_target.live:
+            b.live-=1
+
+            target.new_target(screen,RED)
+        if b.hittest(another_target) and another_target.live and b.live:
             another_target.live = 0
             another_target.hit()
-            b.live = b.live - 1
-            another_target.new_target(screen)
+            b.live-=1
+
+            another_target.new_target(screen,CYAN)
+    for f in fireballs:
+        f.move()
+        if f.hittest(target) and target.live and f.live:
+            target.live = 0
+            target.hit()
+            f.live -= 0.5
+
+            target.new_target(screen,RED)
+        if f.hittest(another_target) and another_target.live and f.live:
+            another_target.live = 0
+            another_target.hit()
+            f.live-=0.5
+
+            another_target.new_target(screen,CYAN)
 
     gun.power_up()
 
