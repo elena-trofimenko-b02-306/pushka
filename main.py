@@ -21,6 +21,13 @@ GAME_COLORS = [RED, BLUE, YELLOW, GREEN, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
+font_name = pygame.font.match_font('arial')
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
 
 
 class Another_Ball:
@@ -70,7 +77,7 @@ class Another_Ball:
             self.color,
             (self.x, self.y),
             self.r)
-        pygame.draw.circle(self.screen,WHITE,(self.x, self.y),self.r/2)
+        pygame.draw.circle(self.screen,BLACK,(self.x, self.y),self.r/2)
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
@@ -83,6 +90,10 @@ class Another_Ball:
         if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
             return True
         return False
+    def gunhittest(self,gun):
+         if((self.x-(gun.x+10))**2 + (self.y-(gun.y-10))**2)**0.5 <= self.r+10:
+             return True
+         return False
 class Ball:
     def __init__(self, screen: pygame.Surface,gun, y=450):
         """ Конструктор класса ball
@@ -131,6 +142,12 @@ class Ball:
             (self.x, self.y),
             self.r
         )
+        pygame.draw.circle(
+            self.screen,
+            GREY,
+            (self.x, self.y),
+            self.r/2
+        )
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
@@ -143,6 +160,10 @@ class Ball:
         if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
             return True
         return False
+    def anothergunhittest(self,another_gun):
+         if((self.x-(another_gun.x+10))**2 + (self.y-(another_gun.y-10))**2)**0.5<=self.r+10:
+             return True
+         return False
 class FireBall:
     def __init__(self, screen: pygame.Surface ,gun , x=40, y=450):
         """ Конструктор класса ball
@@ -170,15 +191,80 @@ class FireBall:
         if self.x>=789 or self.x <= 10:
             self.vx = -(self.vx)*0.9
             if self.x>=789:
-                self.x = self.x-5
+                self.x = self.x-10
             else:
-                self.x = self.x +5
+                self.x = self.x +10
         if (self.y>=590) or self.y <=10:
             self.vy = -(self.vy)*0.9
             if (self.y >= 590):
-                self.y = self.y - 5
+                self.y = self.y - 10
             else:
-                self.y = self.y + 5
+                self.y = self.y + 10
+        self.x += self.vx
+        self.y += self.vy
+        self.vy = self.vy + 1
+
+
+    def draw(self):
+        pygame.draw.circle(
+            self.screen,
+            (250, 102, 0) ,
+            (self.x, self.y),
+            self.r
+        )
+        pygame.draw.circle(
+            self.screen,
+            GREY,
+            (self.x, self.y),
+            self.r/2
+        )
+
+    def hittest(self, obj):
+        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
+
+        Args:
+            obj: Обьект, с которым проверяется столкновение.
+        Returns:
+            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
+        """
+        if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
+            return True
+        return False
+    def anothergunhittest(self,another_gun):
+         if((self.x-(another_gun.x+10))**2 + (self.y-(another_gun.y-10))**2)**0.5<=self.r+10:
+             return True
+         return False
+class Another_FireBall:
+    def __init__(self, screen: pygame.Surface ,another_gun , x=40):
+        """ Конструктор класса ball
+
+        Args:
+        x - начальное положение мяча по горизонтали
+        y - начальное положение мяча по вертикали
+        """
+        self.screen = screen
+        self.x = x
+        self.y = another_gun.y
+        self.r = 15
+        self.vx = 0
+        self.vy = 0
+        self.color = MAGENTA
+        self.live = 5
+
+    def move(self):
+
+        if self.x>=784 or self.x <= 15:
+            self.vx = -(self.vx)*0.9
+            if self.x>=789:
+                self.x = 784 - abs(784 - self.x)
+            else:
+                self.x = 15 + abs(15 - self.x)
+        if (self.y>=585) or self.y <=15:
+            self.vy = -(self.vy)*0.9
+            if (self.y >= 585):
+                self.y = self.y - 10
+            else:
+                self.y = self.y + 10
         self.x += self.vx
         self.y += self.vy
         self.vy = self.vy + 1
@@ -209,67 +295,10 @@ class FireBall:
         if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
             return True
         return False
-class Another_FireBall:
-    def __init__(self, screen: pygame.Surface ,another_gun , x=40):
-        """ Конструктор класса ball
-
-        Args:
-        x - начальное положение мяча по горизонтали
-        y - начальное положение мяча по вертикали
-        """
-        self.screen = screen
-        self.x = x
-        self.y = another_gun.y
-        self.r = 15
-        self.vx = 0
-        self.vy = 0
-        self.color = MAGENTA
-        self.live = 5
-
-    def move(self):
-
-        if self.x>=784 or self.x <= 15:
-            self.vx = -(self.vx)*0.9
-            if self.x>=789:
-                self.x = self.x-7.5
-            else:
-                self.x = self.x +7.5
-        if (self.y>=585) or self.y <=15:
-            self.vy = -(self.vy)*0.9
-            if (self.y >= 585):
-                self.y = self.y - 7.5
-            else:
-                self.y = self.y + 7.5
-        self.x += self.vx
-        self.y += self.vy
-        self.vy = self.vy + 1
-
-
-    def draw(self):
-        pygame.draw.circle(
-            self.screen,
-            (250, 102, 0) ,
-            (self.x, self.y),
-            self.r
-        )
-        pygame.draw.circle(
-            self.screen,
-            WHITE,
-            (self.x, self.y),
-            self.r/2
-        )
-
-    def hittest(self, obj):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
-        """
-        if ((self.x - obj.x)**2 + (self.y-obj.y)**2)**0.5 <= (self.r + obj.r):
-            return True
-        return False
+    def gunhittest(self,gun):
+         if(((self.x-(gun.x+10))**2 + (self.y-(gun.y-10))**2)**0.5<=self.r+10):
+             return True
+         return False
 
 class Gun:
     def __init__(self, screen):
@@ -280,6 +309,7 @@ class Gun:
         self.color = GREY
         self.vx = 1
         self.x = 20
+        self.y = 150
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -311,7 +341,7 @@ class Gun:
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan((event.pos[1]-450) / (event.pos[0]-20))
+            self.an = math.atan(abs(event.pos[1]-450) + 1 / abs(event.pos[0]-20) + 1)
         if self.f2_on:
             self.color = RED
         else:
@@ -319,8 +349,8 @@ class Gun:
 
     def draw(self):
         #FIXIT don't know how to do it
-        pygame.draw.rect(self.screen,GREY,(self.x,460,20,20))
-        pygame.draw.rect(self.screen, MAGENTA, (self.x-10, 460, 10, 50))
+        pygame.draw.rect(self.screen,GREY,(self.x,self.y,20,20))
+
 
     def power_up(self):
         if self.f2_on:
@@ -354,6 +384,7 @@ class Gun2:
         self.an = 1
         self.color = GREY
         self.vy = 1
+        self.x = 100
         self.y = 420
 
     def fire2_start(self, event):
@@ -373,7 +404,7 @@ class Gun2:
         else:
             new_ball = Another_FireBall(self.screen, another_gun)
         new_ball.r += 5
-        self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
+        self.an = math.atan2(abs((event.pos[1]-new_ball.y))+1, abs((event.pos[0]-new_ball.x))+1)
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
         if k==0:
@@ -386,7 +417,7 @@ class Gun2:
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan((event.pos[1]-450) / (event.pos[0]-20))
+            self.an = math.atan(abs(event.pos[1]-450) +1 / abs((event.pos[0]-20)) + 1)
         if self.f2_on:
             self.color = RED
         else:
@@ -394,8 +425,8 @@ class Gun2:
 
     def draw(self):
         #FIXIT don't know how to do it
-        pygame.draw.rect(self.screen,BLACK,(20,self.y+40,20,20))
-        pygame.draw.rect(self.screen, MAGENTA, (10, self.y+40, 10, 50))
+        pygame.draw.rect(self.screen,BLACK,(20,self.y,20,20))
+
 
     def power_up(self):
         if self.f2_on:
@@ -555,6 +586,9 @@ balls = []
 fireballs = []
 another_balls = []
 another_fireballs = []
+points = 0
+another_points = 0
+text = "blackpoints = 0, greypoints  = 0"
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
@@ -565,6 +599,7 @@ finished = False
 
 while not finished:
     screen.fill(WHITE)
+    draw_text(screen, text, 18, WIDTH / 2, 10)
     gun.draw()
     another_gun.draw()
     target.draw()
@@ -573,6 +608,7 @@ while not finished:
     another_target.move()
     gun.move()
     another_gun.move()
+    text = "greypoints = "+str(points)+ "     blackpoints  = " + str(another_points)
     for b in balls:
         if b.live>0:
            b.draw()
@@ -614,14 +650,27 @@ while not finished:
             target.live = 0
             target.hit()
             b.live-=1
+            points+=1
 
             target.new_target(screen,RED)
         if b.hittest(another_target) and another_target.live and b.live:
             another_target.live = 0
             another_target.hit()
             b.live-=1
-
             another_target.new_target(screen,CYAN)
+            points += 2
+        if b.anothergunhittest(another_gun):
+            b.vx = -b.vx
+            b.vy = -b.vy
+            if b.x<gun.x + 10:
+                b.x -=5
+            else:
+                b.x +=5
+            if b.y<gun.y - 10:
+                b.y -=5
+            else:
+                b.y +=5
+            points += 3
     for f in fireballs:
         f.move()
         if f.hittest(target) and target.live and f.live:
@@ -629,10 +678,25 @@ while not finished:
             target.hit()
             f.live -= 0.5
             target.new_target(screen,RED)
+            points +=1
         if f.hittest(another_target) and another_target.live and f.live:
             another_target.live = 0
             another_target.hit()
             f.live-=0.5
+            another_target.new_target(screen, CYAN)
+            points +=2
+        if f.anothergunhittest(another_gun):
+            f.vx = -f.vx
+            f.vy = -f.vy
+            if f.x < gun.x + 10:
+                f.x -= 5
+            else:
+                f.x += 5
+            if f.y < gun.y - 10:
+                f.y -= 5
+            else:
+                f.y += 5
+            points += 3
     for ab in another_balls:
         ab.move()
         if ab.hittest(target) and target.live and ab.live:
@@ -640,11 +704,25 @@ while not finished:
             target.hit()
             ab.live -= 1
             target.new_target(screen, RED)
+            another_points +=1
         if ab.hittest(another_target) and another_target.live and ab.live:
             another_target.live = 0
             another_target.hit()
             ab.live -= 1
             another_target.new_target(screen, CYAN)
+            another_points +=2
+        if ab.gunhittest(gun):
+            ab.vx = -ab.vx
+            ab.vy = -ab.vy
+            if ab.x < another_gun.x + 10:
+                ab.x -= 5
+            else:
+                ab.x += 5
+            if ab.y < another_gun.y - 10:
+                ab.y -= 5
+            else:
+                ab.y += 5
+            another_points += 3
     for af in another_fireballs:
         af.move()
         if af.hittest(target) and target.live and af.live:
@@ -652,11 +730,25 @@ while not finished:
             target.hit()
             af.live -= 0.5
             target.new_target(screen, RED)
+            another_points +=1
         if af.hittest(another_target) and another_target.live and af.live:
              another_target.live = 0
              another_target.hit()
              af.live -= 0.5
              another_target.new_target(screen,CYAN)
+             another_points += 2
+        if af.gunhittest(gun):
+            af.vx = -af.vx
+            af.vy = -af.vy
+            if af.x < gun.x + 10:
+                af.x -= 5
+            else:
+                af.x += 5
+            if af.y < gun.y - 10:
+                af.y -= 5
+            else:
+                af.y += 5
+            another_points += 3
     gun.power_up()
     another_gun.power_up()
 
