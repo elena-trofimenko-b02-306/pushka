@@ -39,7 +39,7 @@ class Another_Ball:
         y - начальное положение мяча по вертикали
         """
         self.screen = screen
-        self.x = x
+        self.x = another_gun.x
         self.y = another_gun.y
         self.r = 10
         self.vx = 0
@@ -91,7 +91,7 @@ class Another_Ball:
             return True
         return False
     def gunhittest(self,gun):
-         if((self.x-(gun.x+10))**2 + (self.y-(gun.y-10))**2)**0.5 <= self.r+10:
+         if((self.x-(gun.x+20))**2 + (self.y-(gun.y-20))**2)**0.5 <= self.r+15:
              return True
          return False
 class Ball:
@@ -104,7 +104,7 @@ class Ball:
         """
         self.screen = screen
         self.x = gun.x
-        self.y = y
+        self.y = gun.y
         self.r = 10
         self.vx = 0
         self.vy = 0
@@ -161,7 +161,7 @@ class Ball:
             return True
         return False
     def anothergunhittest(self,another_gun):
-         if((self.x-(another_gun.x+10))**2 + (self.y-(another_gun.y-10))**2)**0.5<=self.r+10:
+         if((self.x-(another_gun.x+20))**2 + (self.y-(another_gun.y-20))**2)**0.5<=self.r+15:
              return True
          return False
 class FireBall:
@@ -174,7 +174,7 @@ class FireBall:
         """
         self.screen = screen
         self.x = gun.x
-        self.y = y
+        self.y = gun.y
         self.r = 15
         self.vx = 0
         self.vy = 0
@@ -231,11 +231,11 @@ class FireBall:
             return True
         return False
     def anothergunhittest(self,another_gun):
-         if((self.x-(another_gun.x+10))**2 + (self.y-(another_gun.y-10))**2)**0.5<=self.r+10:
+         if((self.x-(another_gun.x+20))**2 + (self.y-(another_gun.y-20))**2)**0.5<=self.r+15:
              return True
          return False
 class Another_FireBall:
-    def __init__(self, screen: pygame.Surface ,another_gun , x=40):
+    def __init__(self, screen: pygame.Surface ,another_gun ):
         """ Конструктор класса ball
 
         Args:
@@ -243,7 +243,7 @@ class Another_FireBall:
         y - начальное положение мяча по вертикали
         """
         self.screen = screen
-        self.x = x
+        self.x = another_gun.x
         self.y = another_gun.y
         self.r = 15
         self.vx = 0
@@ -296,7 +296,7 @@ class Another_FireBall:
             return True
         return False
     def gunhittest(self,gun):
-         if(((self.x-(gun.x+10))**2 + (self.y-(gun.y-10))**2)**0.5<=self.r+10):
+         if(((self.x-(gun.x+20))**2 + (self.y-(gun.y-20))**2)**0.5<=self.r+15):
              return True
          return False
 
@@ -341,7 +341,7 @@ class Gun:
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan(abs(event.pos[1]-450) + 1 / abs(event.pos[0]-20) + 1)
+            self.an = math.atan((abs(event.pos[1]-450) + 1) /( abs(event.pos[0]-20) + 1))
         if self.f2_on:
             self.color = RED
         else:
@@ -349,7 +349,7 @@ class Gun:
 
     def draw(self):
         #FIXIT don't know how to do it
-        pygame.draw.rect(self.screen,GREY,(self.x,self.y,20,20))
+        pygame.draw.rect(self.screen,GREY,(self.x,self.y,40,40))
 
 
     def power_up(self):
@@ -385,7 +385,7 @@ class Gun2:
         self.color = GREY
         self.vy = 1
         self.x = 100
-        self.y = 420
+        self.y = 220
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -417,7 +417,7 @@ class Gun2:
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan(abs(event.pos[1]-450) +1 / abs((event.pos[0]-20)) + 1)
+            self.an = math.atan((abs(event.pos[1]-450) +1 )/ (abs((event.pos[0]-20)) + 1))
         if self.f2_on:
             self.color = RED
         else:
@@ -425,7 +425,7 @@ class Gun2:
 
     def draw(self):
         #FIXIT don't know how to do it
-        pygame.draw.rect(self.screen,BLACK,(20,self.y,20,20))
+        pygame.draw.rect(self.screen,BLACK,(self.x,self.y,40,40))
 
 
     def power_up(self):
